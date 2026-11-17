@@ -1,462 +1,60 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Biscochito Sub Finder</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Super Sub Dashboard</title>
+<meta name="description" content="Biscochito's Super Sub Dashboard: Interaction Log, Sub Finder and Message Library. For Biscochito staff.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#126B76">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Super Sub">
 <style>
-/* Layout: two-pane working tool. Left picks the shift, right ranks who to call, in the order the scheduling process already follows. */
-:root{
-  --bg:#F2F5F4; --surface:#FFFFFF; --sunk:#E9EEEC; --ink:#17221F; --muted:#56665F; --line:#D5DDD9;
-  --accent:#126B76; --accent-ink:#FFFFFF; --accent-soft:#DAEEF0;
-  --good:#2C7A4C; --good-soft:#E0F1E6; --warn:#985606; --warn-soft:#FAEDD6; --bad:#AE2A21; --bad-soft:#F8E0DE;
-  --display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
-  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  --r:10px;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0F1614; --surface:#17201D; --sunk:#1E2925; --ink:#E4EBE8; --muted:#97A8A1; --line:#2A3632;
-  --accent:#5BC2CB; --accent-ink:#0B1D1F; --accent-soft:#143639;
-  --good:#6DCB95; --good-soft:#163222; --warn:#EDB05A; --warn-soft:#382912; --bad:#F08A81; --bad-soft:#3B1C1A; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0F1614; --surface:#17201D; --sunk:#1E2925; --ink:#E4EBE8; --muted:#97A8A1; --line:#2A3632;
-  --accent:#5BC2CB; --accent-ink:#0B1D1F; --accent-soft:#143639;
-  --good:#6DCB95; --good-soft:#163222; --warn:#EDB05A; --warn-soft:#382912; --bad:#F08A81; --bad-soft:#3B1C1A; color-scheme:dark}
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
-.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
-header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
-h1{font-family:var(--display);font-weight:700;font-size:1.9rem;letter-spacing:-.01em;margin:0;line-height:1.1;text-wrap:balance}
-.sub{color:var(--muted);margin:4px 0 0}
-.sample{font-size:.8rem;background:var(--warn-soft);color:var(--warn);border-radius:999px;padding:5px 12px;font-weight:700}
-.me{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
-.me input{width:110px}
-input,select,textarea,button{font:inherit;color:inherit}
-input,select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 9px}
-button{cursor:pointer}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.app{display:grid;grid-template-columns:minmax(280px,370px) minmax(0,1fr);gap:18px;align-items:start}
-@media (max-width:840px){.app{grid-template-columns:1fr}}
-.pane{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
-.step{font-family:var(--display);font-weight:700;font-size:1.05rem;margin:0;display:flex;gap:10px;align-items:center}
-.step b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:.8rem}
-.seg{display:flex;background:var(--sunk);border-radius:9px;padding:3px;gap:3px}
-.seg button{flex:1;border:0;background:transparent;border-radius:7px;padding:7px 6px;font-size:.85rem;color:var(--muted);font-weight:700}
-.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0 / .12)}
-.list{display:flex;flex-direction:column;gap:6px;max-height:560px;overflow:auto;margin:0 -4px;padding:0 4px}
-.daylabel{display:flex;justify-content:space-between;gap:8px;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-top:8px}
-.shift{display:grid;grid-template-columns:1fr auto;gap:2px 8px;text-align:left;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:9px 11px}
-.shift:hover{border-color:var(--accent)}
-.shift[aria-current="true"]{border-color:var(--accent);background:var(--accent-soft)}
-.shift[disabled]{opacity:.45;cursor:default}
-.shift .who{font-weight:700}
-.shift .when{color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
-.shift .tag{grid-row:1/3;grid-column:2;align-self:center}
-.tag{font-size:.72rem;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
-.t-callin{background:var(--bad-soft);color:var(--bad)}
-.t-vacant{background:var(--warn-soft);color:var(--warn)}
-.t-covered{background:var(--good-soft);color:var(--good)}
-.t-plain{background:var(--sunk);color:var(--muted)}
-.empty{color:var(--muted);text-align:center;padding:40px 10px}
-.target{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-start;padding-bottom:14px;border-bottom:1px solid var(--line)}
-.target h2{font-family:var(--display);font-size:1.5rem;margin:0;line-height:1.15}
-.target .when{color:var(--muted);font-variant-numeric:tabular-nums;margin-top:2px}
-.dx{margin-top:8px;display:flex;flex-direction:column;gap:1px;max-width:52ch}
-.dx .lbl,.lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--muted)}
-.note{font-size:.88rem;margin-top:6px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font-size:.78rem;border-radius:6px;padding:3px 8px;background:var(--sunk);color:var(--ink)}
-.chip.need{background:var(--accent-soft);color:var(--accent);font-weight:700}
-.chip.good{background:var(--good-soft);color:var(--good)}
-.chip.warn{background:var(--warn-soft);color:var(--warn)}
-.chip.bad{background:var(--bad-soft);color:var(--bad)}
-.toggle{display:flex;gap:8px;align-items:center;font-size:.88rem;color:var(--muted)}
-.banner{background:var(--good-soft);color:var(--good);border-radius:var(--r);padding:10px 14px;font-weight:700}
-.banner span{font-weight:400;color:var(--ink);display:block}
-section.tier{display:flex;flex-direction:column;gap:8px}
-.tier h3{font-family:var(--display);font-size:1.02rem;margin:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.tier h3 small{font-family:var(--body);font-weight:400;color:var(--muted);font-size:.83rem}
-.none{color:var(--muted);font-size:.88rem;padding:4px 0}
-.cand{border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;display:flex;flex-direction:column;gap:8px}
-.cand.top{border-color:var(--good);box-shadow:inset 3px 0 0 var(--good)}
-.crow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
-.cname{font-weight:700;font-size:1.02rem}
-.phone{font-variant-numeric:tabular-nums;color:var(--muted);user-select:all;font-size:.88rem}
-.hrs{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
-.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 11px;font-size:.85rem;font-weight:700}
-.btn{text-decoration:none;color:var(--ink);display:inline-block;line-height:1.3}
-.btn:hover{border-color:var(--accent);color:var(--accent)}
-.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.status{font-size:.85rem;padding:5px 8px}
-.msg{display:flex;flex-direction:column;gap:6px}
-.msg textarea{width:100%;min-height:96px;line-height:1.45;resize:vertical;font-size:.9rem}
-.swap{background:var(--sunk);border-radius:8px;padding:9px 11px;font-size:.88rem;display:flex;flex-direction:column;gap:5px}
-.swap strong{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.bf{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
-details.out summary{cursor:pointer;font-family:var(--display);font-weight:700}
-.duty p{margin:0}
-.msg .lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--muted)}
-.btn.quiet{border-color:transparent;background:transparent;color:var(--muted)}
-.outrow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.88rem}
-.outrow:last-child{border-bottom:0}
-.outrow span:last-child{color:var(--muted);text-align:right}
-.how{font-size:.85rem;color:var(--muted)}
-.how summary{cursor:pointer;font-weight:700;color:var(--ink)}
-.how ol{padding-left:20px;margin:8px 0 0;display:flex;flex-direction:column;gap:4px}
-@media (prefers-reduced-motion:no-preference){.cand,.shift{transition:border-color .15s}}
+  :root{--bg:#F2F5F4;--surface:#fff;--ink:#17221F;--muted:#56665F;--line:#D5DDD9;--accent:#126B76;--accent-ink:#fff;--soft:#DAEEF0}
+  @media (prefers-color-scheme: dark){:root{--bg:#0F1614;--surface:#17201D;--ink:#E4EBE8;--muted:#97A8A1;--line:#2A3632;--accent:#5BC2CB;--accent-ink:#0B1D1F;--soft:#143639;color-scheme:dark}}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-left,0px)) 24px max(16px,env(safe-area-inset-right,0px))}
+  main{max-width:440px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px 24px;display:flex;flex-direction:column;gap:16px;text-align:center}
+  img{width:72px;height:72px;border-radius:18px;margin:0 auto}
+  h1{margin:0;font-size:1.6rem;line-height:1.15}
+  p{margin:0;color:var(--muted)}
+  a.go{display:block;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:700;font-size:1.1rem;border-radius:12px;padding:14px 18px}
+  a.go:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+  details{text-align:left;background:var(--soft);border-radius:12px;padding:10px 14px;font-size:.92rem}
+  summary{cursor:pointer;font-weight:700}
+  details ol{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+  .small{font-size:.82rem}
 </style>
-
-<div class="wrap">
-  <header>
-    <div>
-      <h1>Sub Finder</h1>
-      <p class="sub">Find coverage for a call-in or open visit. Week of Mon Nov 2 to Sun Nov 8, 2026.</p>
-    </div>
-    <div class="actions">
-      <span class="sample">Sample schedule. Not connected to AlayaCare yet.</span>
-      <label class="me" for="whoami">I'm <select id="whoami"><option value="s1">Alma Trujillo, super sub</option><option value="s2">Rafael Duran, super sub</option><option value="other">Someone else</option></select></label><input id="myname" aria-label="Your name, for texts" placeholder="Your name" hidden>
-    </div>
-  </header>
-
-  <div class="app">
-    <aside class="pane">
-      <p class="step"><b>1</b>Choose a visit that needs a sub</p>
-      <div class="list" id="shiftlist"></div>
-      <details class="how">
-        <summary>How suggestions are ranked</summary>
-        <ol>
-          <li>Caregivers free during the visit who have worked with this person before and cover every care need.</li>
-          <li>Caregivers free during the visit who cover every need but are new to this person.</li>
-          <li>The super sub on duty that day, last. If that's you, the visit is yours once nobody above can take it.</li>
-        </ol>
-        <p>Caregivers who don't match the client's male or female caregiver preference are left off the lists. The super sub on duty still covers, and calls the family first to let them know.</p>
-        <p>Within each group, whoever has worked the most shifts with this person comes first.</p>
-      </details>
-    </aside>
-
-    <main class="pane" id="result" aria-live="polite"></main>
-  </div>
-</div>
-
+</head>
+<body>
+<main>
+  <img src="icon-180.png" alt="">
+  <h1>Super Sub Dashboard</h1>
+  <p id="status">Opening the dashboard…</p>
+  <a class="go" id="go" href="https://script.google.com/a/macros/biscochito.org/s/AKfycbw2CLnrshlYLjEihllTXv2rXLOHJuSDQdWAQQ8bn8qsH8U-TM2qyadqWa_zE-fAIQ0G/exec">Open the dashboard</a>
+  <p class="small">For Biscochito staff. Google will ask you to sign in with your @biscochito.org account.</p>
+  <details>
+    <summary>Put it on your phone's home screen</summary>
+    <ol>
+      <li><b>iPhone (Safari):</b> tap the Share button, then <b>Add to Home Screen</b>.</li>
+      <li><b>Android (Chrome):</b> tap the ⋮ menu, then <b>Add to Home screen</b>.</li>
+      <li>Do this on this page, supersub-dashboard.netlify.app, before it opens the dashboard. If it already moved on, come back and tap <b>Stay here</b> below.</li>
+    </ol>
+  </details>
+  <p class="small"><a href="?stay" id="stay">Stay here</a></p>
+</main>
 <script>
-const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const NOW=3*24+14+25/60; // Thu Nov 5, 2:25 PM
-const NEEDS={dem:'Dementia care',fall:'Fall risk',hoyer:'Hoyer lift',bath:'Bathing assist',span:'Spanish-speaking',diab:'Diabetes support',night:'Overnight'};
-const ALL=Object.keys(NEEDS);
-const CG=[
- {id:'c1',name:'Rosa Archuleta',phone:'(505) 555-0141',skills:['dem','fall','span','bath'],off:[5,6]},
- {id:'c2',name:'Marcus Tafoya',phone:'(505) 555-0182',skills:['hoyer','bath','fall'],off:[]},
- {id:'c3',name:'Lena Vigil',phone:'(505) 555-0127',skills:['span','diab','dem'],off:[6]},
- {id:'c4',name:'Danielle Ortiz',phone:'(505) 555-0163',skills:['night','fall','diab'],off:[5,6]},
- {id:'c5',name:'Joaquin Baca',phone:'(505) 555-0119',skills:['hoyer','span','bath'],off:[]},
- {id:'c6',name:'Teresa Montoya',phone:'(505) 555-0175',skills:['dem','fall','diab'],off:[5,6]},
- {id:'c7',name:'Priya Shah',phone:'(505) 555-0136',skills:['dem','diab'],off:[6]},
- {id:'c8',name:'Sam Gallegos',phone:'(505) 555-0158',skills:['night','fall','bath','hoyer'],off:[0,2]},
- {id:'c9',name:'Hannah Lujan',phone:'(505) 555-0194',skills:['bath','dem','fall'],off:[6]},
- {id:'c10',name:'Ellie Romero',phone:'(505) 555-0147',skills:['span','diab','bath'],off:[6]},
- {id:'c11',name:'Victor Chavez',phone:'(505) 555-0110',skills:['hoyer','diab','fall'],off:[6]},
- {id:'c12',name:'Mae Sandoval',phone:'(505) 555-0133',skills:['dem','fall','night'],off:[0,1]},
- {id:'s1',name:'Alma Trujillo',phone:'(505) 555-0101',skills:ALL,off:[],sub:true},
- {id:'s2',name:'Rafael Duran',phone:'(505) 555-0102',skills:['hoyer','fall','bath','span','night','diab'],off:[],sub:true},
-];
-const CL=[
- {id:'cl1',name:'Eleanor W.',needs:['dem','fall']},
- {id:'cl2',name:'Frank D.',needs:['hoyer','bath']},
- {id:'cl3',name:'Josefina M.',needs:['span','diab']},
- {id:'cl4',name:'Harold B.',needs:['night','fall']},
- {id:'cl5',name:'Gloria S.',needs:['hoyer']},
- {id:'cl6',name:'Ramón C.',needs:['span']},
- {id:'cl7',name:'Betty L.',needs:['dem']},
- {id:'cl8',name:'Walter K.',needs:['diab']},
- {id:'cl9',name:'Irene P.',needs:['bath']},
- {id:'cl10',name:'Lucille A.',needs:['dem','fall']},
-];
-const HIST={ // past visits, client -> caregiver
- cl1:{c1:120,c6:110,c9:6,c12:3,s1:4}, cl2:{c2:200,c5:150,c8:5,c11:2,s2:3}, cl3:{c3:90,c10:85,c5:4,s2:6},
- cl4:{c4:60,c8:40,c12:2}, cl5:{c2:40,c11:38,c8:3}, cl6:{c5:30,c10:12,c1:2}, cl7:{c7:70,c9:4,c3:3,s1:2},
- cl8:{c7:25,c11:30,c6:2}, cl9:{c9:44,c8:20,c1:5}, cl10:{c9:80,c12:50,c6:3,s1:5}};
-const TPL=[
- ['cl1',[0,1,2,3,4],8,14,'c1'],['cl1',[0,1,2,3,4],14,20,'c6'],
- ['cl2',[0,1,2,3,4,5,6],7,11,'c2'],['cl2',[0,1,2,3,4,5,6],17,20,'c5'],
- ['cl3',[0,1,2,3,4,5],9,15,'c3'],['cl3',[0,1,2,3,4,5],15,19,'c10'],
- ['cl4',[0,1,2,3],20,32,'c4'],['cl4',[4,5,6],20,32,'c8'],
- ['cl5',[0,2,4],12,16,'c2'],['cl5',[1,3],12,16,'c11'],
- ['cl6',[1,3],9,13,'c5'],['cl6',[5],9,13,'c10'],
- ['cl7',[0,1,2,3,4],10,14,'c7'],
- ['cl8',[0,2],15,18,'c7'],['cl8',[1,3,5],8,11,'c11'],
- ['cl9',[0,2,4],9,13,'c9'],['cl9',[1,3],14,18,'c8'],
- ['cl10',[0,1,2,3,4],15,19,'c9'],['cl10',[5,6],9,15,'c12'],
-];
-const OPEN={
- 'cl10-3-15':{status:'callin',was:'c9',note:'Hannah called in sick at 1:50 PM.'},
- 'cl4-3-20':{status:'callin',was:'c4',note:'Danielle called in with a family emergency.'},
- 'cl2-4-17':{status:'vacant',was:'c5',note:'Joaquin has approved time off.'},
- 'cl3-5-9':{status:'vacant',was:'c3',note:'Lena has approved time off.'},
- 'cl10-6-9':{status:'callin',was:'c12',note:'Mae called in for a family event.'},
-};
-const DUTY=['s1','s2','s1','s1','s2','s2','s1']; // super sub on duty, Mon to Sun
-const DAYFULL=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const SHIFTS=[];
-TPL.forEach(([cl,days,st,en,cg])=>days.forEach(d=>{const id=`${cl}-${d}-${st}`;const o=OPEN[id];
-  SHIFTS.push({id,client:cl,day:d,start:st,end:en,cg:o?null:cg,open:o||null,a:d*24+st,b:d*24+en});}));
-SHIFTS.sort((x,y)=>x.a-y.a||x.client.localeCompare(y.client));
-const GENDER={c1:'F',c2:'M',c3:'F',c4:'F',c5:'M',c6:'F',c7:'F',c8:'M',c9:'F',c10:'F',c11:'M',c12:'F',s1:'F',s2:'M'};
-CG.forEach(c=>c.g=GENDER[c.id]);
-const PREF={cl1:'F',cl2:'M',cl3:'F',cl7:'F',cl10:'F'}; // client's caregiver gender preference
-CL.forEach(c=>c.pref=PREF[c.id]||null);
-const DX={
- cl1:"Alzheimer's disease, moderate stage. History of falls.",
- cl2:'Multiple sclerosis. Uses a wheelchair and transfers with a Hoyer lift.',
- cl3:'Type 2 diabetes. Mild hearing loss.',
- cl4:"Parkinson's disease. Wakes during the night and is unsteady on his feet.",
- cl5:'Stroke with weakness on the left side.',
- cl6:'COPD. Uses oxygen at home.',
- cl7:'Vascular dementia.',
- cl8:'Type 2 diabetes and congestive heart failure.',
- cl9:'Osteoarthritis in both knees.',
- cl10:'Lewy body dementia. Unsteady when walking.'};
-CL.forEach(c=>c.dx=DX[c.id]);
-const FAMILY={ // primary family contact
- cl1:{name:'David W.',rel:'son',phone:'(505) 555-0201'}, cl2:{name:'Carol D.',rel:'wife',phone:'(505) 555-0202'},
- cl3:{name:'Marisol M.',rel:'daughter',phone:'(505) 555-0203'}, cl4:{name:'Ruth B.',rel:'wife',phone:'(505) 555-0204'},
- cl5:{name:'Kevin S.',rel:'son',phone:'(505) 555-0205'}, cl6:{name:'Ana C.',rel:'daughter',phone:'(505) 555-0206'},
- cl7:{name:'Linda L.',rel:'daughter',phone:'(505) 555-0207'}, cl8:{name:'Joan K.',rel:'wife',phone:'(505) 555-0208'},
- cl9:{name:'Mark P.',rel:'son',phone:'(505) 555-0209'}, cl10:{name:'Grace A.',rel:'niece',phone:'(505) 555-0210'}};
-CL.forEach(c=>c.family=FAMILY[c.id]);
-const GW={F:'female',M:'male'};
-const prefOk=(c,cl)=>!clById[cl].pref||c.g===clById[cl].pref;
-const cgById=Object.fromEntries(CG.map(c=>[c.id,c])), clById=Object.fromEntries(CL.map(c=>[c.id,c]));
-const tel=p=>'+1'+p.replace(/\D/g,'');
-const first=n=>n.split(' ')[0], short=n=>{const p=n.split(' ');return p[0]+' '+p[1][0]+'.'};
-
-// state
-const store={get(k,d){try{const v=localStorage.getItem('subfinder:'+k);return v?JSON.parse(v):d}catch(e){return d}},
-  set(k,v){try{localStorage.setItem('subfinder:'+k,JSON.stringify(v))}catch(e){}}};
-let sel=store.get('sel','cl10-3-15');
-let statuses=store.get('statuses',{}), openMsg=null;
-const whoEl=document.getElementById('whoami'), nameIn=document.getElementById('myname');
-whoEl.value=store.get('who','s1'); nameIn.value=store.get('me','');
-const syncWho=()=>{nameIn.hidden=whoEl.value!=='other'}; syncWho();
-whoEl.addEventListener('change',()=>{store.set('who',whoEl.value);syncWho();renderResult()});
-nameIn.addEventListener('input',()=>{store.set('me',nameIn.value);renderResult()});
-const myName=()=>whoEl.value==='other'?(nameIn.value.trim()||'the office'):first(cgById[whoEl.value].name);
-
-// formatting
-function fmt(h){const hh=((h%24)+24)%24;const m=Math.round((hh%1)*60);const h12=Math.floor(hh)%12||12;return `${h12}:${String(m).padStart(2,'0')} ${hh<12?'AM':'PM'}`}
-const dayLabel=d=>`${DAYS[d]} Nov ${2+d}`;
-const when=s=>`${dayLabel(s.day)}, ${fmt(s.start)} to ${fmt(s.end)}${s.end>24?' next day':''}`;
-const hrs=n=>(Math.round(n*10)/10).toString().replace(/\.0$/,'');
-const hu=n=>hrs(n)+(Math.abs(n-1)<.05?' hr':' hrs');
-
-// logic
-const overlap=(a,b)=>a.a<b.b&&b.a<a.b;
-const shiftsOf=(cg,skip=[])=>SHIFTS.filter(s=>s.cg===cg&&!skip.includes(s.id));
-const missing=(cg,cl)=>clById[cl].needs.filter(n=>!cgById[cg].skills.includes(n));
-const visits=(cg,cl)=>(HIST[cl]||{})[cg]||0;
-function score(cg,cl){return visits(cg,cl)}
-function busy(cg,t,skip=[]){return shiftsOf(cg,[t.id,...skip]).filter(s=>overlap(s,t))}
-function excludedFor(t){const x=new Set();if(t.open)x.add(t.open.was);if(t.cg)x.add(t.cg);return x}
-
-function analyze(t){
-  const ex=excludedFor(t), cl=t.client;
-  const direct=[],fresh=[],swaps=[],subs=[],out=[];
-  CG.forEach(c=>{
-    if(ex.has(c.id)){out.push([c,t.open&&t.open.was===c.id?'Called in or off for this visit':'Already assigned here']);return}
-    if(!prefOk(c,cl)){if(!c.sub)out.push([c,`${clById[cl].name} prefers a ${GW[clById[cl].pref]} caregiver`]);return}
-    if(c.off.includes(t.day)){if(!c.sub)out.push([c,`Day off on ${DAYS[t.day]}`]);return}
-    const miss=missing(c.id,cl);
-    if(miss.length){if(!c.sub)out.push([c,'Missing: '+miss.map(m=>NEEDS[m]).join(', ')]);return}
-    const b=busy(c.id,t);
-    if(c.sub){if(!b.length){subs.push({c,s:score(c.id,cl)})}return}
-    if(!b.length){(visits(c.id,cl)?direct:fresh).push({c,s:score(c.id,cl)});return}
-    // swap candidate: frees their conflicting visit(s)
-    const backfill=b.map(s=>({s,opts:backfillFor(s,new Set([...ex,c.id]))}));
-    const covered=backfill.every(x=>x.opts.length);
-    swaps.push({c,b,backfill,covered,s:score(c.id,cl)+(covered?1000:0)});
-    out.push([c,`Working with ${b.map(s=>clById[s.client].name).join(', ')} at that time`]);
-  });
-  const by=(x,y)=>y.s-x.s;
-  return {direct:direct.sort(by),fresh:fresh.sort(by),swaps:swaps.filter(w=>visits(w.c.id,cl)||w.covered).sort(by),subs:subs.sort(by),out};
-}
-function backfillFor(s,ex){
-  return CG.filter(c=>!ex.has(c.id)&&!c.off.includes(s.day)&&!missing(c.id,s.client).length&&!busy(c.id,s).length)
-    .map(c=>({c,v:visits(c.id,s.client),s:visits(c.id,s.client)-(c.sub?1000:0)}))
-    .sort((x,y)=>y.s-x.s).slice(0,3);
-}
-
-// messages
-function textFor(c,t,swap,duty){
-  const me=myName(), cl=clById[t.client].name, v=visits(c.id,t.client);
-  const time=`${dayLabel(t.day)}, ${fmt(t.start)} to ${fmt(t.end)}`;
-  if(swap){const other=swap.map(s=>`${clById[s.client].name} (${fmt(s.start)} to ${fmt(s.end)})`).join(' and ');
-    return `Hi ${first(c.name)}, it's ${me} at Biscochito. Are you open to switching visits on ${dayLabel(t.day)}? ${cl} needs someone ${fmt(t.start)} to ${fmt(t.end)}${v?`, and you already know the routine`:''}. We'll line up someone for ${other} so they're covered. Can you call or text me back when you get a minute? Thank you.`}
-  if(duty) return `Hi ${first(c.name)}, it's ${me}. ${cl} needs coverage ${time}, and nobody else is free to take it. You're the super sub on duty ${DAYFULL[t.day]}, so it comes to you.${prefOk(c,t.client)?'':` ${cl} prefers a ${GW[clById[t.client].pref]} caregiver, so please call the family before the visit to let them know you're the super sub on duty and the one available to cover.`} Can you confirm you've got it? Thank you.`;
-  return `Hi ${first(c.name)}, it's ${me} at Biscochito. ${cl} needs coverage ${time}.${v?` You've been with ${cl} before, so you know the routine.`:''} Can you take it? A yes or no back is perfect. Thank you.`;
-}
-
-function callFor(c,t,duty){
-  const me=myName(), f=first(c.name), cl=clById[t.client], v=visits(c.id,t.client);
-  const time=`${dayLabel(t.day)}, ${fmt(t.start)} to ${fmt(t.end)}`;
-  const needs=cl.needs.map(n=>NEEDS[n].toLowerCase()).join(' and ');
-  const why=duty?`Nobody else is free to take it. You're the super sub on duty ${DAYFULL[t.day]}, so it comes to you.${prefOk(c,t.client)?'':` ${cl.name} prefers a ${GW[cl.pref]} caregiver, so please call the family before the visit. Let them know you're the super sub on duty and the one available to cover.`}`
-    :v?`You've been with ${cl.name} before, so you know the routine.`:`You haven't been with ${cl.name} yet. The care needs are ${needs}.`;
-  return `Hi ${f}, it's ${me} from Biscochito. Do you have a minute?
-
-${cl.name} needs coverage ${time}. ${why}
-
-${duty?'Can you confirm you have it?':'Are you able to take it?'}
-
-If yes: Thank you. I'll put you on the visit in AlayaCare now.
-If no: No problem. Thanks for picking up.
-
-If voicemail: Hi ${f}, it's ${me} from Biscochito. ${cl.name} needs coverage ${time}. Call or text me back at [your number] if you can take it. Thank you.`;
-}
-let drafts=store.get('drafts',{});
-
-// render: left
-const listEl=document.getElementById('shiftlist');
-function confirmedFor(id){const m=statuses[id]||{};const k=Object.keys(m).find(k=>m[k]==='Confirmed');return k?cgById[k]:null}
-function tagFor(s){
-  const conf=confirmedFor(s.id);
-  if(conf) return `<span class="tag t-covered">Covered: ${short(conf.name)}</span>`;
-  if(s.open) return `<span class="tag ${s.open.status==='callin'?'t-callin':'t-vacant'}">${s.open.status==='callin'?'Call-in':'Open'}</span>`;
-  return `<span class="tag t-plain">${short(cgById[s.cg].name)}</span>`;
-}
-function item(s,label){
-  const past=s.b<=NOW;
-  return `<button class="shift" data-id="${s.id}" ${s.id===sel?'aria-current="true"':''} ${past?'disabled':''}>
-    <span class="who">${label}</span><span class="when">${past?'Done. ':''}${fmt(s.start)} to ${fmt(s.end)}</span>${tagFor(s)}</button>`;
-}
-function renderList(){
-  const o=SHIFTS.filter(s=>s.b>NOW&&s.open);
-  let html='',d=-1;
-  o.forEach(s=>{if(s.day!==d){d=s.day;html+=`<div class="daylabel"><span>${dayLabel(d)}</span><span>Super sub: ${short(cgById[DUTY[d]].name)}</span></div>`}html+=item(s,clById[s.client].name)});
-  listEl.innerHTML=html||'<p class="empty">No visits need a sub right now.</p>';
-  listEl.querySelectorAll('.shift').forEach(b=>b.addEventListener('click',()=>{sel=b.dataset.id;store.set('sel',sel);openMsg=null;renderList();renderResult();
-    if(matchMedia('(max-width:840px)').matches)document.getElementById('result').scrollIntoView({behavior:'smooth'})}));
-}
-
-// render: right
-const resEl=document.getElementById('result');
-function chipsFor(x,cl,extra=''){
-  const v=visits(x.c.id,cl), name=clById[cl].name;
-  return `<div class="chips">${v?`<span class="chip good"><b>${v}</b> shifts with ${name}</span>`:`<span class="chip"><b>0</b> shifts with ${name}, new</span>`}${clById[cl].pref?`${prefOk(x.c,cl)?`<span class="chip good">Matches ${GW[clById[cl].pref]} preference</span>`:'<span class="chip warn">Calls the family first</span>'}`:''}${extra}</div>`;
-}
-const STAT=['Not contacted','Texted','Called','No answer','Declined','Confirmed'];
-function card(x,t,i,top,swap,duty){
-  const st=(statuses[t.id]||{})[x.c.id]||'Not contacted', key=`${x.c.id}`;
-  const panel=openMsg&&openMsg.startsWith(key+':')?openMsg.split(':')[1]:null;
-  const dk=`${t.id}|${key}|${panel}`, id=`d-${key}-${panel}`;
-  const val=panel?(drafts[dk]??(panel==='call'?callFor(x.c,t,duty):textFor(x.c,t,x.b,duty))):'';
-  const esc=v=>v.replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  return `<div class="cand ${top?'top':''}">
-    <div class="crow"><div><span class="cname">${x.c.name}</span>${x.c.sub?' <span class="chip need">Super sub</span>':''}<div class="phone">${x.c.phone}</div></div>
-      <div class="actions">
-        <button class="btn ${top&&panel!=='call'?'primary':''}" data-panel="${key}:call" aria-expanded="${panel==='call'}">${panel==='call'?'Hide call script':'Call'}</button>
-        <button class="btn ${top&&panel!=='text'?'primary':''}" data-panel="${key}:text" aria-expanded="${panel==='text'}">${panel==='text'?'Hide text':'Text'}</button>
-        <select class="status" data-st="${x.c.id}" aria-label="Contact status for ${x.c.name}">${STAT.map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select>
-      </div></div>
-    ${chipsFor(x,t.client)}
-    ${swap||''}
-    ${panel==='call'?`<div class="msg"><label class="lbl" for="${id}">What to say. Edit as you like.</label>
-      <textarea id="${id}" data-draft="${dk}" rows="11">${esc(val)}</textarea>
-      <div class="actions"><a class="btn primary" href="tel:${tel(x.c.phone)}">Call ${first(x.c.name)}</a><button class="btn" data-copy="${id}">Copy script</button><button class="btn quiet" data-reset="${dk}">Reset draft</button></div>
-      <span class="hrs">Call opens your phone app. If nothing opens, dial ${x.c.phone}.</span></div>`:''}
-    ${panel==='text'?`<div class="msg"><label class="lbl" for="${id}">Text message. Edit before sending.</label>
-      <textarea id="${id}" data-draft="${dk}" rows="5">${esc(val)}</textarea>
-      <div class="actions"><a class="btn primary" data-sms="${id}" data-num="${tel(x.c.phone)}" href="sms:${tel(x.c.phone)}">Send text</a><button class="btn" data-copy="${id}">Copy text</button><button class="btn quiet" data-reset="${dk}">Reset draft</button></div>
-      <span class="hrs">Send text opens your messaging app with this message filled in. If nothing opens, copy it and send it to ${x.c.phone}.</span></div>`:''}
-  </div>`;
-}
-function swapBlock(w){
-  return `<div class="swap">${w.backfill.map(({s,opts})=>`<strong>Then cover ${clById[s.client].name}, ${fmt(s.start)} to ${fmt(s.end)}</strong>
-    ${opts.length?opts.map(o=>`<div class="bf"><span>${o.c.name}${o.c.sub?' (super sub)':''}</span>
-      <span class="chip ${o.v?'good':''}">${o.v?o.v+' shifts with '+clById[s.client].name:'0 shifts, new'}</span></div>`).join('')
-      :'<div class="bf"><span class="chip bad">Nobody free to take this visit</span></div>'}`).join('')}</div>`;
-}
-function tier(title,hint,items,t,startTop,swap){
-  return `<section class="tier"><h3>${title} <small>${hint}</small></h3>
-    ${items.length?items.map((x,i)=>card(x,t,i,startTop&&i===0,swap?swapBlock(x):'')).join(''):'<div class="none">Nobody here.</div>'}</section>`;
-}
-function familyScript(t,d){
-  const cl=clById[t.client], f=cl.family, who=first(cl.name), time=`${dayLabel(t.day)}, ${fmt(t.start)} to ${fmt(t.end)}`;
-  return `Hi ${first(f.name)}, this is ${first(d.name)}, the super sub on duty with Biscochito. Nobody else is free for ${who}'s visit ${time}, so I'm the one available to cover it. I know ${who} prefers a ${GW[cl.pref]} caregiver. Is it okay if I come?
-
-If yes: Thank you. See you at ${fmt(t.start)}.
-If no: I understand. I'll let the office know right away.
-
-Voicemail: Hi ${first(f.name)}, it's ${first(d.name)}, the super sub on duty with Biscochito. I'm available to cover ${who}'s visit ${time}. Please call me back at [your number].`;
-}
-function familyPanel(t,d){
-  const f=clById[t.client].family, open=openMsg==='fam:call', dk=`${t.id}|fam2|call`, id='d-fam-call';
-  const val=drafts[dk]??familyScript(t,d);
-  return `<div class="cand"><div class="crow"><div><span class="cname">${f.name}</span> <span class="chip">${first(clById[t.client].name)}'s ${f.rel}</span><div class="phone">${f.phone}</div></div>
-    <div class="actions"><button class="btn" data-panel="fam:call" aria-expanded="${open}">${open?'Hide family call script':'Family call script'}</button></div></div>
-    ${open?`<div class="msg"><label class="lbl" for="${id}">What to say to the family. Edit as you like.</label>
-      <textarea id="${id}" data-draft="${dk}" rows="8">${val.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>
-      <div class="actions"><a class="btn primary" href="tel:${tel(f.phone)}">Call ${first(f.name)}</a><button class="btn" data-copy="${id}">Copy script</button><button class="btn quiet" data-reset="${dk}">Reset draft</button></div>
-      <span class="hrs">Call opens your phone app. If nothing opens, dial ${f.phone}.</span></div>`:''}</div>`;
-}
-function dutyBlock(t,top){
-  const d=cgById[DUTY[t.day]], mine=whoEl.value===d.id, day=DAYFULL[t.day];
-  const miss=missing(d.id,t.client), b=busy(d.id,t);
-  const cln=clById[t.client].name, pw=GW[clById[t.client].pref];
-  const fam=!prefOk(d,t.client)?(mine
-    ?`${cln} prefers a ${pw} caregiver. If nobody above can take it, call the family before the visit. Let them know you're the super sub on duty and the one available to cover.`
-    :`${cln} prefers a ${pw} caregiver. If ${first(d.name)} covers, ${first(d.name)} calls the family before the visit to let them know they're the super sub on duty and the one available to cover.`):'';
-  const famHtml=fam?`<div class="chips"><span class="chip warn">${fam}</span></div>${familyPanel(t,d)}`:'';
-  const issue=miss.length?`${first(d.name)} doesn't cover ${miss.map(m=>NEEDS[m]).join(', ')}. Check with the office.`
-    :b.length?`${first(d.name)} is already with ${b.map(s=>clById[s.client].name).join(', ')} at that time. Check with the office.`:'';
-  if(mine) return `<section class="tier"><h3>Super sub on duty <small>${day}</small></h3>
-    <div class="cand duty ${top?'top':''}"><span class="cname">You're the super sub on duty ${day}.</span>
-    <p>Reach out to the caregivers above first. If nobody can take it, this visit is yours.</p>
-    ${famHtml}${issue?`<div class="chips"><span class="chip bad">${issue}</span></div>`:''}
-    <div class="actions"><button class="btn ${top?'primary':''}" data-take="${d.id}">I'll take this visit</button></div></div></section>`;
-  return `<section class="tier"><h3>Super sub on duty <small>${day}. Reach out to ${first(d.name)} if nobody above can take it.</small></h3>
-    ${famHtml}${issue?`<div class="chips"><span class="chip bad">${issue}</span></div>`:''}${card({c:d},t,0,top,'',true)}</section>`;
-}
-function renderResult(){
-  const t=SHIFTS.find(s=>s.id===sel&&s.open&&s.b>NOW)||SHIFTS.find(s=>s.open&&s.b>NOW);if(t&&t.id!==sel){sel=t.id;renderList()}
-  if(!t){resEl.innerHTML='<p class="empty">Pick a visit on the left to see who can cover it.</p>';return}
-  const cl=clById[t.client], A=analyze(t), conf=confirmedFor(t.id);
-  const status=t.open?(t.open.status==='callin'?'<span class="tag t-callin">Call-in</span>':'<span class="tag t-vacant">Open visit</span>')
-    :`<span class="tag t-plain">Scheduled: ${cgById[t.cg].name}</span>`;
-  const note=t.open?t.open.note:`${first(cgById[t.cg].name)} is on this visit now. Suggestions treat it as a call-in.`;
-  const firstTop=A.direct.length?'direct':A.fresh.length?'fresh':'subs';
-  resEl.innerHTML=`
-   <p class="step"><b>2</b>Who to contact, in order</p>
-   <div class="target"><div><h2>${cl.name}</h2><div class="when">${when(t)}</div>
-     <div class="dx"><span class="lbl">Diagnosis</span>${cl.dx}</div>
-     <div class="note">${note}</div></div>
-     <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">${status}
-     <div class="chips">${cl.pref?`<span class="chip warn"><b>Prefers a ${GW[cl.pref]} caregiver</b></span>`:'<span class="chip">No gender preference</span>'}${cl.needs.map(n=>`<span class="chip need">${NEEDS[n]}</span>`).join('')}</div></div></div>
-   ${conf?`<div class="banner">Confirmed: ${conf.name} is covering this visit.<span>Next step: assign ${first(conf.name)} to the visit in AlayaCare.</span></div>`:''}
-   ${tier(`Free and knows ${cl.name}`,'Call these first',A.direct,t,firstTop==='direct')}
-   ${tier(`Free, new to ${cl.name}`,'Covers every care need',A.fresh,t,firstTop==='fresh')}
-   ${dutyBlock(t,firstTop==='subs')}
-   <details class="out"><summary>Ruled out (${A.out.length})</summary>
-     ${A.out.map(([c,why])=>`<div class="outrow"><span>${c.name}</span><span>${why}</span></div>`).join('')}</details>`;
-  resEl.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',()=>{openMsg=openMsg===b.dataset.panel?null:b.dataset.panel;renderResult()}));
-  resEl.querySelectorAll('[data-draft]').forEach(ta=>ta.addEventListener('input',()=>{drafts[ta.dataset.draft]=ta.value;store.set('drafts',drafts)}));
-  resEl.querySelectorAll('[data-reset]').forEach(b=>b.addEventListener('click',()=>{delete drafts[b.dataset.reset];store.set('drafts',drafts);renderResult()}));
-  resEl.querySelectorAll('[data-sms]').forEach(a=>{const ta=document.getElementById(a.dataset.sms);
-    const set=()=>{a.href=`sms:${a.dataset.num}?&body=${encodeURIComponent(ta.value)}`};set();
-    ta.addEventListener('input',set);a.addEventListener('click',set)});
-  resEl.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{
-    const ta=document.getElementById(b.dataset.copy);
-    const done=()=>{b.textContent='Copied'};
-    const fallback=()=>{ta.focus();ta.select();b.textContent='Selected. Press copy.'};
-    try{navigator.clipboard.writeText(ta.value).then(done,fallback)}catch(e){fallback()}}));
-  resEl.querySelectorAll('[data-take]').forEach(b=>b.addEventListener('click',()=>{
-    statuses[t.id]=statuses[t.id]||{};Object.keys(statuses[t.id]).forEach(k=>{if(statuses[t.id][k]==='Confirmed')statuses[t.id][k]='Not contacted'});
-    statuses[t.id][b.dataset.take]='Confirmed';store.set('statuses',statuses);renderList();renderResult()}));
-  resEl.querySelectorAll('[data-st]').forEach(s=>s.addEventListener('change',()=>{
-    statuses[t.id]=statuses[t.id]||{};statuses[t.id][s.dataset.st]=s.value;
-    if(s.value==='Confirmed')Object.keys(statuses[t.id]).forEach(k=>{if(k!==s.dataset.st&&statuses[t.id][k]==='Confirmed')statuses[t.id][k]='Not contacted'});
-    store.set('statuses',statuses);renderList();renderResult()}));
-}
-renderList();renderResult();
+  // Go straight to the dashboard unless the address has ?stay (used for adding the home-screen icon).
+  if (!/[?&]stay\b/.test(location.search)) {
+    setTimeout(function(){ location.replace(document.getElementById('go').href); }, 600);
+  } else {
+    document.getElementById('status').textContent = 'Add this page to your home screen, then tap Open the dashboard.';
+    document.getElementById('stay').hidden = true;
+  }
 </script>
-
-</body></html>
+</body>
+</html>
